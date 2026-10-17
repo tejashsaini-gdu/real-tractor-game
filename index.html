@@ -1,24 +1,57 @@
 <!DOCTYPE html>
-<html lang="hi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TRACTOR GAME - ONLINE OFFLINE</title>
-<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#000;overflow:hidden;font-family:sans-serif}canvas{display:block}#menu{position:absolute;inset:0;background:#0a1a0f;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:99;text-align:center;padding:20px}#playBtn{padding:15px 30px;background:#00ff88;color:#000;border:none;border-radius:30px;font-weight:900;font-size:18px;margin-top:20px}</style>
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
-</head><body><canvas id="c"></canvas>
-<div id="menu"><h1>🚜 REAL TRACTOR WORLD</h1><p>ONLINE + OFFLINE + GANNA TROLLEY</p><p style="font-size:12px;opacity:0.7;margin-top:10px">G = Ganna Load, Y = Trolley, P = Hal, B = Bechna Mill pe</p><button id="playBtn">▶️ GAME START</button><p style="margin-top:10px;font-size:11px;opacity:0.5">tejashsaini-gdu.github.io/real-tractor-game</p></div>
-<script type="module">
-import * as THREE from 'three';
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x87ceeb);
-const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,0.1,1000);
-const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});renderer.setSize(innerWidth,innerHeight);
-scene.add(new THREE.AmbientLight(0xffffff,0.8));const sun=new THREE.DirectionalLight(0xffffff,0.9);sun.position.set(50,80,30);scene.add(sun);
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(1000,1000),new THREE.MeshStandardMaterial({color:0x8bc34a}));ground.rotation.x=-Math.PI/2;scene.add(ground);
-const road=new THREE.Mesh(new THREE.PlaneGeometry(20,1000),new THREE.MeshStandardMaterial({color:0x222}));road.rotation.x=-Math.PI/2;road.position.y=0.05;scene.add(road);
-function mkTractor(c){let g=new THREE.Group();let b=new THREE.Mesh(new THREE.BoxGeometry(2,1,3),new THREE.MeshStandardMaterial({color:c}));b.position.y=1;g.add(b);let ca=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.2,1.3),new THREE.MeshStandardMaterial({color:0x111}));ca.position.set(0,1.8,-0.2);g.add(ca);return g;}
-let tractor=mkTractor(0xc62828);scene.add(tractor);let trolley=new THREE.Group();let tb=new THREE.Mesh(new THREE.BoxGeometry(3,0.4,6),new THREE.MeshStandardMaterial({color:0x8d6e63}));tb.position.y=0.9;trolley.add(tb);let ganna=new THREE.Mesh(new THREE.BoxGeometry(2.5,1,5),new THREE.MeshStandardMaterial({color:0xCDDC39}));ganna.position.y=1.7;ganna.visible=false;trolley.add(ganna);trolley.userData.ganna=ganna;scene.add(trolley);
-let mill=new THREE.Group();let shed=new THREE.Mesh(new THREE.BoxGeometry(30,12,20),new THREE.MeshStandardMaterial({color:0xb71c1c}));shed.position.y=6;mill.add(shed);mill.position.set(0,0,-150);scene.add(mill);
-let pos=new THREE.Vector3(),angle=0,vel=0,steer=0,keys={},gannaLoad=0,money=0;
-document.getElementById('playBtn').onclick=()=>{document.getElementById('menu').style.display='none';};
-function upd(dt){let f=keys['w']||keys['arrowup'],bk=keys['s']||keys['arrowdown'],l=keys['a']||keys['arrowleft'],r=keys['d']||keys['arrowright'];if(f)vel+=0.015;if(bk)vel-=0.01;vel*=0.98;vel=Math.max(-0.4,Math.min(0.5,vel));let ts=0;if(l)ts=0.8;if(r)ts=-0.8;steer+=(ts-steer)*0.1;if(Math.abs(vel)>0.01)angle+=steer*vel*0.05;pos.x+=Math.sin(angle)*vel*-40*dt;pos.z+=Math.cos(angle)*vel*-40*dt;tractor.position.copy(pos);tractor.position.y=0;tractor.rotation.y=angle;let tx=pos.x+Math.sin(angle)*6,tz=pos.z+Math.cos(angle)*6;trolley.position.set(tx,0,tz);trolley.rotation.y=angle;trolley.userData.ganna.visible=gannaLoad>0;if(mill && gannaLoad>0 && Math.hypot(pos.x-mill.position.x,pos.z-mill.position.z)<20){money+=2000;gannaLoad=0;alert('Ganna Bech Diya! Rs.'+money);}let cp=new THREE.Vector3(pos.x+Math.sin(angle)*12,5,pos.z+Math.cos(angle)*12);camera.position.lerp(cp,0.1);camera.lookAt(pos.x,1,pos.z);}
-let last=0;function loop(t){let dt=Math.min(0.03,(t-last)/1000);last=t;upd(dt);renderer.render(scene,camera);requestAnimationFrame(loop);}requestAnimationFrame(loop);
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if(e.key.toLowerCase()=='g'){gannaLoad=1;}if(e.key.toLowerCase()=='b'&&gannaLoad>0&&Math.hypot(pos.x-mill.position.x,pos.z-mill.position.z)<25){money+=2000;gannaLoad=0;}});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-</script></body></html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Real Tractor World - Mobile</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;touch-action:none}
+body{background:#1a5d1a;font-family:Arial;overflow:hidden;height:100vh}
+#gameCanvas{background:#8bc34a;display:block;width:100%;height:100vh}
+#ui{position:absolute;top:0;left:0;width:100%;padding:10px;display:flex;justify-content:space-between;color:white;font-weight:bold;z-index:10}
+#controls{position:absolute;bottom:0;left:0;width:100%;height:180px;display:flex;justify-content:space-between;align-items:flex-end;padding:15px;z-index:20}
+#leftPad{width:120px;height:120px;background:rgba(0,0,0,0.3);border-radius:50%;position:relative;border:2px solid white}
+#stick{width:50px;height:50px;background:white;border-radius:50%;position:absolute;left:35px;top:35px}
+.btn{width:70px;height:70px;border-radius:15px;border:none;font-weight:bold;font-size:11px;margin:5px}
+#actionBtns{display:flex;flex-direction:column}
+#b1{background:#ffeb3b} #b2{background:#4caf50;color:white} #b3{background:#ff5722;color:white}
+#driveBtns button{width:60px;height:60px;background:rgba(0,0,0,0.5);border:2px solid white;border-radius:10px;color:white;font-size:24px}
+#startScreen{position:absolute;top:0;left:0;width:100%;height:100%;background:#1a3a1a;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:100;color:white;text-align:center}
+#startBtn{padding:15px 40px;font-size:20px;background:#ffeb3b;border:none;border-radius:30px;font-weight:bold;margin-top:20px}
+</style>
+</head>
+<body>
+<div id="ui"><span id="score">Ganna: 0/10</span><span id="money">₹0</span></div>
+<canvas id="gameCanvas"></canvas>
+<div id="controls">
+<div style="display:flex;align-items:center;gap:10px">
+<div id="leftPad"><div id="stick"></div></div>
+<div id="driveBtns"><button id="leftBtn">◀</button><button id="rightBtn">▶</button></div>
+</div>
+<div id="actionBtns">
+<button class="btn" id="b1">GANNA LOAD</button>
+<button class="btn" id="b2">TROLLEY</button>
+<button class="btn" id="b3">BECHNA</button>
+</div>
+</div>
+<div id="startScreen"><h1>🚜 REAL TRACTOR WORLD</h1><p>Mobile Smooth Edition</p><button id="startBtn">▶ GAME START</button></div>
+<script>
+const canvas=document.getElementById('gameCanvas');const ctx=canvas.getContext('2d');let W,H;function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}resize();
+let gameStarted=false;let tractor={x:W/2,y:H/2,angle:0,ganna:0,hasTrolley:false};let keys={left:false,right:false};let joystick={dx:0};let gannaField={x:W*0.2,y:H*0.3};let mill={x:W*0.7,y:H*0.3};let money=0;
+const pad=document.getElementById('leftPad');const stick=document.getElementById('stick');let padRect;
+pad.addEventListener('touchstart',e=>{padRect=pad.getBoundingClientRect();handleStick(e.touches[0])});pad.addEventListener('touchmove',e=>{e.preventDefault();handleStick(e.touches[0])},{passive:false});pad.addEventListener('touchend',()=>{joystick.dx=0;stick.style.left='35px';stick.style.top='35px'});
+function handleStick(t){let cx=padRect.left+60;let cy=padRect.top+60;let dx=t.clientX-cx;let dist=Math.min(Math.sqrt(dx*dx),45);stick.style.left=(35+dx/2)+'px';joystick.dx=dx/45;}
+document.getElementById('leftBtn').addEventListener('touchstart',()=>keys.left=true);document.getElementById('leftBtn').addEventListener('touchend',()=>keys.left=false);
+document.getElementById('rightBtn').addEventListener('touchstart',()=>keys.right=true);document.getElementById('rightBtn').addEventListener('touchend',()=>keys.right=false);
+function tryLoad(){let d=Math.hypot(tractor.x-gannaField.x,tractor.y-gannaField.y);if(d<200&&tractor.ganna<10){tractor.ganna++;updateUI()}else if(tractor.ganna>=10){alert('Full! Mill pe jao')}else{alert('Green Khet me jao')}} 
+function tryTrolley(){tractor.hasTrolley=!tractor.hasTrolley;updateUI()} 
+function trySell(){let d=Math.hypot(tractor.x-mill.x,tractor.y-mill.y);if(d<200&&tractor.ganna>0){money+=tractor.ganna*50;tractor.ganna=0;updateUI();alert('Bech diya ₹'+money)}else{alert('Mill pe jao ya Ganna load karo')}}
+document.getElementById('b1').addEventListener('touchstart',e=>{e.preventDefault();tryLoad()});document.getElementById('b2').addEventListener('touchstart',e=>{e.preventDefault();tryTrolley()});document.getElementById('b3').addEventListener('touchstart',e=>{e.preventDefault();trySell()});
+function updateUI(){document.getElementById('score').innerText='Ganna: '+tractor.ganna+'/10';document.getElementById('money').innerText='₹'+money;}
+document.getElementById('startBtn').addEventListener('click',()=>{document.getElementById('startScreen').style.display='none';gameStarted=true;gannaField.x=W*0.25;gannaField.y=H*0.3;mill.x=W*0.75;mill.y=H*0.3;loop();});
+function loop(){if(!gameStarted)return;if(keys.left||joystick.dx<-0.2)tractor.angle-=0.06;if(keys.right||joystick.dx>0.2)tractor.angle+=0.06;tractor.x+=Math.cos(tractor.angle)*3;tractor.y+=Math.sin(tractor.angle)*3;if(tractor.x<0)tractor.x=W;if(tractor.x>W)tractor.x=0;if(tractor.y<0)tractor.y=H-180;if(tractor.y>H-180)tractor.y=0;draw();requestAnimationFrame(loop);}
+function draw(){ctx.fillStyle='#8bc34a';ctx.fillRect(0,0,W,H);ctx.fillStyle='#4caf50';ctx.fillRect(gannaField.x-60,gannaField.y-60,120,120);ctx.fillStyle='white';ctx.font='12px Arial';ctx.fillText('GANNA KHET',gannaField.x-35,gannaField.y-70);ctx.fillStyle='#d32f2f';ctx.fillRect(mill.x-50,mill.y-50,100,100);ctx.fillText('SUGAR MILL',mill.x-35,mill.y-60);ctx.fillStyle='#795548';ctx.fillRect(0,H/2-20,W,40);ctx.save();ctx.translate(tractor.x,tractor.y);ctx.rotate(tractor.angle);ctx.fillStyle='#ff5722';ctx.fillRect(-20,-10,35,20);if(tractor.hasTrolley){ctx.fillStyle='#8d6e63';ctx.fillRect(-40,-12,18,24);if(tractor.ganna>0){ctx.fillStyle='#7cb342';ctx.fillRect(-40,-12,18*tractor.ganna/10,24)}}ctx.restore();}
+updateUI();
+</script>
+</body>
+</html>
